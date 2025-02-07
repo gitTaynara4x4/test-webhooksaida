@@ -4,11 +4,10 @@ app = Flask(__name__)
 
 VALID_TOKEN = "8i5l6yr9laqc0oi2y06vu1eg6003koo7"
 
-@app.route("/handler", methods=["POST", "GET"])
+@app.route("/handler", methods=["POST"])
 def handle_webhook():
-    if request.method == "GET":
-        return jsonify({"status": "Webhook ativo! Use POST para enviar dados."}), 200
-    
+    print(f"🔔 Requisição recebida: {request.method} {request.path}")
+
     token = request.headers.get('Authorization')
     if token != f"Bearer {VALID_TOKEN}":
         print("⚠️ Token inválido!")
@@ -17,9 +16,9 @@ def handle_webhook():
     data = request.json
     print("🔔 Webhook recebido:", data)
 
-    # Extraindo o ID do card e a mudança feita
-    card_id = data.get("data[FIELDS][ID]", "ID não encontrado")
-    changes = data.get("data[FIELDS]", {})
+    # Captura o ID do Card corretamente
+    card_id = data.get("data", {}).get("FIELDS", {}).get("ID", "ID não encontrado")
+    changes = data.get("data", {}).get("FIELDS", {})
 
     print(f"📝 ID do Card: {card_id}")
     print(f"🔄 Mudanças feitas: {changes}")
