@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # Rota que irá tratar os eventos de webhook
-@app.route("/handler", methods=["POST"])
+@app.route("/handler", methods=["GET"])
 def handle_webhook():
     print("🔔 Rota /handler foi chamada!")
     
