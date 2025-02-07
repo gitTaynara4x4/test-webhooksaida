@@ -9,15 +9,26 @@ def handle_webhook():
     print(f"🔔 Requisição recebida: {request.method} {request.path}")
 
     token = request.headers.get('Authorization')
-    if token != f"Bearer {VALID_TOKEN}":
+    print(f"🔑 Token recebido: {token}")  # Debug para verificar se o token vem corretamente
+
+    if not token or token.strip() != f"Bearer {VALID_TOKEN}":
         print("⚠️ Token inválido!")
         return jsonify({"status": "Unauthorized"}), 401
 
     data = request.json
     print("🔔 Webhook recebido:", data)
 
-    # Captura o ID do Card corretamente
-    card_id = data.get("data", {}).get("FIELDS", {}).get("ID", "ID não encontrado")
+    # Tenta capturar o ID corretamente
+    card_id = None
+    if data.get("data", {}).get("FIELDS", {}).get("ID"):
+        card_id = data["data"]["FIELDS"]["ID"]
+    elif data.get("document_id") and len(data["document_id"]) >= 3:
+        card_id = data["document_id"][2].replace("DEAL_", "")  # Remove "DEAL_"
+
+    if not card_id:
+        print("⚠️ Nenhum ID encontrado no payload!")
+        return jsonify({"status": "error", "message": "ID não encontrado"}), 400
+
     changes = data.get("data", {}).get("FIELDS", {})
 
     print(f"📝 ID do Card: {card_id}")
@@ -31,4 +42,4 @@ def handle_webhook():
     return jsonify({"status": "success", "card_id": card_id, "changes": changes}), 200
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=999, debug=True)
+    app.run(host="0.0.0.0", port=999, debug=True, threaded=True)
