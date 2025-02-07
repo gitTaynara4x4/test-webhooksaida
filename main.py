@@ -4,9 +4,10 @@ app = Flask(__name__)
 
 VALID_TOKEN = "8i5l6yr9laqc0oi2y06vu1eg6003koo7"
 
-@app.route("/handler", methods=["POST"])
+@app.route("/handler", methods=["POST", "GET"])
 def handle_webhook():
-    print(f"🔔 Requisição recebida: {request.method} {request.path}")
+    if request.method == "GET":
+        return jsonify({"status": "Webhook ativo! Use POST para enviar dados."}), 200
     
     token = request.headers.get('Authorization')
     if token != f"Bearer {VALID_TOKEN}":
