@@ -5,9 +5,8 @@ app = Flask(__name__)
 # Rota que irá tratar os eventos de webhook
 @app.route("/handler", methods=["POST"])
 def handle_webhook():
+    print(f"🔔 Requisição recebida: {request.method} {request.path}")
     if request.method == "POST":
-        print("🔔 Rota /handler foi chamada!")
-        
         # Captura os dados do webhook enviados pela Bitrix
         data = request.json
         
